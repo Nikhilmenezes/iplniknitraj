@@ -55,41 +55,7 @@
   </form>
 
   <script>
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbyEzsKik3rauyO5LsC5HqqMS0lGDi-xejVdx6jvN-Nv9SNlJ5HTxcVB8RV6NqRCGNtrcw/exec';
-
-    // Fetch and display upcoming matches
-    async function loadUpcomingMatches() {
-      try {
-        const response = await fetch(`${scriptUrl}?action=getUpcomingMatches`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch matches');
-        }
-        const matches = await response.json();
-        console.log('Upcoming matches:', matches);
-
-        const tableBody = document.querySelector('#matchesTable tbody');
-        tableBody.innerHTML = '';
-
-        matches.forEach(match => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${match.matchNo}</td>
-            <td>${match.date}</td>
-            <td>${match.day}</td>
-            <td>${match.start}</td>
-            <td>${match.homeTeam}</td>
-            <td>${match.awayTeam}</td>
-            <td>${match.venue}</td>
-            <td>${match.timeRemaining}</td>
-            <td><button onclick="selectMatch(${match.matchNo})">Select</button></td>
-          `;
-          tableBody.appendChild(row);
-        });
-      } catch (error) {
-        console.error('Error loading matches:', error);
-        alert('Failed to load matches. Check the console for details.');
-      }
-    }
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbzKMO8WAqCL41Stq4myCWeoclkEjamNnTaEdXiWsP78vg0queSGXvlzfxZJ-rpvddEsgA/exec';
 
     // Fetch and display player names
     async function loadPlayers() {
@@ -99,7 +65,7 @@
           throw new Error('Failed to fetch players');
         }
         const players = await response.json();
-        console.log('Players:', players);
+        console.log('Players:', players); // Log the fetched players
 
         const playerSelect = document.getElementById('playerName');
         playerSelect.innerHTML = '';
@@ -116,38 +82,7 @@
       }
     }
 
-    // Select a match
-    function selectMatch(matchNo) {
-      document.getElementById('matchNo').value = matchNo;
-    }
-
-    // Submit prediction
-    document.getElementById('predictionForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const playerName = document.getElementById('playerName').value;
-      const matchNo = document.getElementById('matchNo').value;
-      const prediction = document.getElementById('prediction').value;
-
-      try {
-        const submitResponse = await fetch(scriptUrl, {
-          method: 'POST',
-          body: JSON.stringify({ action: 'submitPrediction', playerName, matchNo, prediction }),
-          headers: { 'Content-Type': 'application/json' }
-        });
-
-        if (submitResponse.ok) {
-          alert('Prediction submitted successfully!');
-        } else {
-          throw new Error('Failed to submit prediction');
-        }
-      } catch (error) {
-        console.error('Error submitting prediction:', error);
-        alert('Failed to submit prediction. Check the console for details.');
-      }
-    });
-
-    // Load matches and players on page load
-    loadUpcomingMatches();
+    // Load players on page load
     loadPlayers();
   </script>
 </body>
