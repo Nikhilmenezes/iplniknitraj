@@ -17,7 +17,7 @@
   </style>
 </head>
 <body>
-  <h1>IPL Bet NIK NIT RAJ</h1>
+  <h1>IPL Betting NIKNITRAJ</h1>
   <h2>Upcoming Matches</h2>
   <table id="matchesTable">
     <thead>
@@ -42,9 +42,7 @@
   <form id="predictionForm">
     <label for="playerName">Player Name:</label>
     <select id="playerName" required>
-      <option value="Player1">Player1</option>
-      <option value="Player2">Player2</option>
-      <option value="Player3">Player3</option>
+      <!-- Options will be populated dynamically -->
     </select>
     <br>
     <label for="matchNo">Match No:</label>
@@ -59,7 +57,7 @@
   <script>
     // Fetch and display upcoming matches
     async function loadUpcomingMatches() {
-      const response = await fetch('https://script.google.com/macros/s/AKfycbwTzO5emubU3zvdwQ0vjzVqrbh9gX7o_4jRP2BDKx7zf9zieXYI1L4tfcLIn-Df9ZqR3w/exec?action=getUpcomingMatches');
+      const response = await fetch('https://script.google.com/macros/s/AKfycbxbspE9Tj3V6imimFev-ZBmU3Ws9I7KPTzKi_ZStQ2f2Z0t6C4X_slWzO229WDTD-iQsw/exec?action=getUpcomingMatches');
       const matches = await response.json();
 
       const tableBody = document.querySelector('#matchesTable tbody');
@@ -82,6 +80,22 @@
       });
     }
 
+    // Fetch and display player names
+    async function loadPlayers() {
+      const response = await fetch('https://script.google.com/macros/s/AKfycbxbspE9Tj3V6imimFev-ZBmU3Ws9I7KPTzKi_ZStQ2f2Z0t6C4X_slWzO229WDTD-iQsw/exec?action=getPlayers');
+      const players = await response.json();
+
+      const playerSelect = document.getElementById('playerName');
+      playerSelect.innerHTML = '';
+
+      players.forEach(player => {
+        const option = document.createElement('option');
+        option.value = player;
+        option.textContent = player;
+        playerSelect.appendChild(option);
+      });
+    }
+
     // Select a match
     function selectMatch(matchNo) {
       document.getElementById('matchNo').value = matchNo;
@@ -95,7 +109,7 @@
       const prediction = document.getElementById('prediction').value;
 
       // Submit prediction
-      const submitResponse = await fetch('https://script.google.com/macros/s/AKfycbwTzO5emubU3zvdwQ0vjzVqrbh9gX7o_4jRP2BDKx7zf9zieXYI1L4tfcLIn-Df9ZqR3w/exec, {
+      const submitResponse = await fetch('Yhttps://script.google.com/macros/s/AKfycbxbspE9Tj3V6imimFev-ZBmU3Ws9I7KPTzKi_ZStQ2f2Z0t6C4X_slWzO229WDTD-iQsw/exec', {
         method: 'POST',
         body: JSON.stringify({ playerName, matchNo, prediction }),
         headers: { 'Content-Type': 'application/json' }
@@ -108,8 +122,9 @@
       }
     });
 
-    // Load matches on page load
+    // Load matches and players on page load
     loadUpcomingMatches();
+    loadPlayers();
   </script>
 </body>
 </html>
