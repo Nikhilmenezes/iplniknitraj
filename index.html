@@ -4,9 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IPL Betting</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+  </style>
 </head>
 <body>
   <h1>IPL Betting 2023</h1>
+  <h2>Upcoming Matches</h2>
+  <table id="matchesTable">
+    <thead>
+      <tr>
+        <th>Match No</th>
+        <th>Date</th>
+        <th>Day</th>
+        <th>Start Time</th>
+        <th>Home Team</th>
+        <th>Away Team</th>
+        <th>Venue</th>
+        <th>Time Remaining</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Rows will be populated dynamically -->
+    </tbody>
+  </table>
+
+  <h2>Submit Prediction</h2>
   <form id="predictionForm">
     <label for="playerName">Player Name:</label>
     <select id="playerName" required>
@@ -15,37 +47,57 @@
       <option value="Player3">Player3</option>
     </select>
     <br>
-    <label for="matchId">Match ID:</label>
-    <input type="number" id="matchId" required>
+    <label for="matchNo">Match No:</label>
+    <input type="number" id="matchNo" required>
     <br>
     <label for="prediction">Prediction:</label>
     <input type="text" id="prediction" required>
     <br>
     <button type="submit">Submit Prediction</button>
   </form>
+
   <script>
+    // Fetch and display upcoming matches
+    async function loadUpcomingMatches() {
+      const response = await fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/exec?action=getUpcomingMatches');
+      const matches = await response.json();
+
+      const tableBody = document.querySelector('#matchesTable tbody');
+      tableBody.innerHTML = '';
+
+      matches.forEach(match => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${match.matchNo}</td>
+          <td>${match.date}</td>
+          <td>${match.day}</td>
+          <td>${match.start}</td>
+          <td>${match.homeTeam}</td>
+          <td>${match.awayTeam}</td>
+          <td>${match.venue}</td>
+          <td>${match.timeRemaining}</td>
+          <td><button onclick="selectMatch(${match.matchNo})">Select</button></td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Select a match
+    function selectMatch(matchNo) {
+      document.getElementById('matchNo').value = matchNo;
+    }
+
+    // Submit prediction
     document.getElementById('predictionForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const playerName = document.getElementById('playerName').value;
-      const matchId = document.getElementById('matchId').value;
+      const matchNo = document.getElementById('matchNo').value;
       const prediction = document.getElementById('prediction').value;
-
-      // Fetch match details to check time
-      const response = await fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/exec?action=getMatchDetails&matchId=' + matchId);
-      const matchDetails = await response.json();
-
-      const matchDateTime = new Date(`${matchDetails.date} ${matchDetails.time}`);
-      const now = new Date();
-
-      if (now >= matchDateTime) {
-        alert('Predictions cannot be submitted after the match start time.');
-        return;
-      }
 
       // Submit prediction
       const submitResponse = await fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/exec', {
         method: 'POST',
-        body: JSON.stringify({ playerName, matchId, prediction }),
+        body: JSON.stringify({ playerName, matchNo, prediction }),
         headers: { 'Content-Type': 'application/json' }
       });
 
@@ -55,6 +107,9 @@
         alert('Failed to submit prediction.');
       }
     });
+
+    // Load matches on page load
+    loadUpcomingMatches();
   </script>
 </body>
 </html>
