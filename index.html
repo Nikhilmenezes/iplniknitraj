@@ -17,7 +17,7 @@
   </style>
 </head>
 <body>
-  <h1>IPL Betting 2023</h1>
+  <h1>IPL Bet NIK NIT RAJ</h1>
   <h2>Upcoming Matches</h2>
   <table id="matchesTable">
     <thead>
@@ -59,7 +59,7 @@
   <script>
     // Fetch and display upcoming matches
     async function loadUpcomingMatches() {
-      const response = await fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/exec?action=getUpcomingMatches');
+      const response = await fetch('https://script.google.com/macros/s/AKfycbwHE-mYK1aexaJUZVhNzU8xLaJLtI-ub9eigsFeWVkKYYPAIrUc8y21G-n_y7xfR5DvNA/exec?action=getUpcomingMatches');
       const matches = await response.json();
 
       const tableBody = document.querySelector('#matchesTable tbody');
@@ -95,7 +95,7 @@
       const prediction = document.getElementById('prediction').value;
 
       // Submit prediction
-      const submitResponse = await fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/exec', {
+      const submitResponse = await fetch('https://script.google.com/macros/s/AKfycbwHE-mYK1aexaJUZVhNzU8xLaJLtI-ub9eigsFeWVkKYYPAIrUc8y21G-n_y7xfR5DvNA/exec, {
         method: 'POST',
         body: JSON.stringify({ playerName, matchNo, prediction }),
         headers: { 'Content-Type': 'application/json' }
