@@ -1,89 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IPL Betting</title>
-  <style>
-    table {
-      width: 100%;
-      border-collapse: collapse;
+  <script>
+    // Fetch match fixtures and display them
+    function fetchMatches() {
+      google.script.run.withSuccessHandler(displayMatches).getMatchFixtures();
     }
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: left;
+
+    // Display matches
+    function displayMatches(matches) {
+      const table = document.getElementById('matchesTable');
+      table.innerHTML = ''; // Clear existing rows
+      matches.forEach(match => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${match.matchNo}</td>
+          <td>${match.date}</td>
+          <td>${match.day}</td>
+          <td>${match.homeTeam} vs ${match.awayTeam}</td>
+          <td>${match.venue}</td>
+          <td>
+            <input type="text" id="player1_${match.matchNo}" placeholder="Player 1 Prediction" ${match.player1Prediction ? 'disabled' : ''}>
+            <input type="text" id="player2_${match.matchNo}" placeholder="Player 2 Prediction" ${match.player2Prediction ? 'disabled' : ''}>
+            <input type="text" id="player3_${match.matchNo}" placeholder="Player 3 Prediction" ${match.player3Prediction ? 'disabled' : ''}>
+          </td>
+          <td><button onclick="submitPrediction(${match.matchNo}, 1)">Submit</button></td>
+          <td><button onclick="submitPrediction(${match.matchNo}, 2)">Submit</button></td>
+          <td><button onclick="submitPrediction(${match.matchNo}, 3)">Submit</button></td>
+        `;
+        table.appendChild(row);
+      });
     }
-  </style>
+
+    // Submit prediction
+    function submitPrediction(matchNo, player) {
+      const prediction = document.getElementById(`player${player}_${matchNo}`).value;
+      if (!prediction) {
+        alert('Please enter a prediction!');
+        return;
+      }
+      google.script.run.withSuccessHandler(function(response) {
+        alert(response);
+        fetchMatches(); // Refresh the matches after submitting the prediction
+      }).submitPrediction(matchNo, player, prediction);
+    }
+
+    window.onload = fetchMatches;
+  </script>
 </head>
 <body>
-  <h1>IPL Betting NIKNITRAJ</h1>
-  <h2>Upcoming Matches</h2>
-  <table id="matchesTable">
+  <h2>Match Fixtures</h2>
+  <table id="matchesTable" border="1">
     <thead>
       <tr>
         <th>Match No</th>
         <th>Date</th>
         <th>Day</th>
-        <th>Start Time</th>
-        <th>Home Team</th>
-        <th>Away Team</th>
+        <th>Match</th>
         <th>Venue</th>
-        <th>Time Remaining</th>
-        <th>Action</th>
+        <th>Predictions</th>
+        <th>Player 1</th>
+        <th>Player 2</th>
+        <th>Player 3</th>
       </tr>
     </thead>
     <tbody>
-      <!-- Rows will be populated dynamically -->
+      <!-- Matches will be dynamically populated here -->
     </tbody>
   </table>
-
-  <h2>Submit Prediction</h2>
-  <form id="predictionForm">
-    <label for="playerName">Player Name:</label>
-    <select id="playerName" required>
-      <!-- Options will be populated dynamically -->
-    </select>
-    <br>
-    <label for="matchNo">Match No:</label>
-    <input type="number" id="matchNo" required>
-    <br>
-    <label for="prediction">Prediction:</label>
-    <input type="text" id="prediction" required>
-    <br>
-    <button type="submit">Submit Prediction</button>
-  </form>
-
-  <script>
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbzKMO8WAqCL41Stq4myCWeoclkEjamNnTaEdXiWsP78vg0queSGXvlzfxZJ-rpvddEsgA/exec';
-
-    // Fetch and display player names
-    async function loadPlayers() {
-      try {
-        const response = await fetch(`${scriptUrl}?action=getPlayers`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch players');
-        }
-        const players = await response.json();
-        console.log('Players:', players); // Log the fetched players
-
-        const playerSelect = document.getElementById('playerName');
-        playerSelect.innerHTML = '';
-
-        players.forEach(player => {
-          const option = document.createElement('option');
-          option.value = player;
-          option.textContent = player;
-          playerSelect.appendChild(option);
-        });
-      } catch (error) {
-        console.error('Error loading players:', error);
-        alert('Failed to load players. Check the console for details.');
-      }
-    }
-
-    // Load players on page load
-    loadPlayers();
-  </script>
 </body>
 </html>
