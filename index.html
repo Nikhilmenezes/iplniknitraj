@@ -1,13 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match Predictions</title>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+      padding: 10px;
+    }
+  </style>
   <script>
+    // The URL of the deployed Google Apps Script Web App
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycbw2LLKojZyQL2p7wd2JSi2s91okDhG0pS1HfJZLX85NZQKZyzS9mnIn339hKMO1ZR7DMg/exec';
+
     // Fetch match fixtures and display them
     function fetchMatches() {
-      google.script.run.withSuccessHandler(displayMatches).getMatchFixtures();
+      fetch(webAppUrl + '?action=getMatchFixtures')
+        .then(response => response.json())
+        .then(matches => displayMatches(matches))
+        .catch(error => console.error('Error fetching matches:', error));
     }
 
-    // Display matches
+    // Display match data in a table
     function displayMatches(matches) {
       const table = document.getElementById('matchesTable');
       table.innerHTML = ''; // Clear existing rows
@@ -32,25 +48,30 @@
       });
     }
 
-    // Submit prediction
+    // Submit prediction for a specific match
     function submitPrediction(matchNo, player) {
       const prediction = document.getElementById(`player${player}_${matchNo}`).value;
       if (!prediction) {
         alert('Please enter a prediction!');
         return;
       }
-      google.script.run.withSuccessHandler(function(response) {
-        alert(response);
-        fetchMatches(); // Refresh the matches after submitting the prediction
-      }).submitPrediction(matchNo, player, prediction);
+      // Send prediction to the Google Apps Script Web App
+      fetch(webAppUrl + '?action=submitPrediction&matchNo=' + matchNo + '&player=' + player + '&prediction=' + encodeURIComponent(prediction))
+        .then(response => response.text())
+        .then(result => {
+          alert(result);
+          fetchMatches(); // Refresh the matches after submitting the prediction
+        })
+        .catch(error => console.error('Error submitting prediction:', error));
     }
 
+    // Call fetchMatches() when the page is loaded
     window.onload = fetchMatches;
   </script>
 </head>
 <body>
   <h2>Match Fixtures</h2>
-  <table id="matchesTable" border="1">
+  <table id="matchesTable">
     <thead>
       <tr>
         <th>Match No</th>
